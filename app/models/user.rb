@@ -13,6 +13,7 @@ class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation
   has_secure_password
   before_save :create_remember_token
+  has_many :microposts, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 50 }
   validates :password, length: { minimum: 6 }
@@ -20,6 +21,10 @@ class User < ActiveRecord::Base
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX },
                     uniqueness: { case_sensitive: false }
+
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
 
   private
 
